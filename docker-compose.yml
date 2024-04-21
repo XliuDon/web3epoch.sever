@@ -1,0 +1,32 @@
+version: '3.4'
+services:
+  mongo_database:
+    image: mongo:latest
+    restart: always
+    ports:
+      - '2717:27017'
+    networks:
+      - node-mongo-app
+    volumes:
+      - mongo_database_data:/data/db
+  node_server:
+    build: .
+    restart: always
+    ports:
+      - '4000:4000'
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    command: yarn run dev
+    env_file:
+      - .env
+    depends_on:
+      - mongo_database
+    networks:
+      - node-mongo-app
+networks:
+  node-mongo-app:
+    driver: bridge
+volumes:
+  mongo_database_data:
+    driver: local

@@ -1,158 +1,96 @@
-import { ClientSession, ObjectId } from 'mongoose'
+import {
+  UserDocument,
+  CreateUserInput,
+  LoginUserInput,
+  LoginUserReturnType,
+  ReturnType,
+} from 'src/types/userType';
+import generateJwtToken from '../utils/generateJwtToken';
 
-import { User } from '@/models'
+import User from '../models/userModel';
+import getHashedPassword from '../utils/getHashedPassword';
+import validatePassword from '../utils/validatePassword';
 
-export const userService = {
-  create: (
-    {
-      email,
-      password,
-      verified = false
-    }: {
-      email: string
-      password: string
-      verified?: boolean
-    },
-    session?: ClientSession
-  ) =>
-    new User({
-      email,
-      password,
-      verified
-    }).save({ session }),
+// Create new user
+export async function createUser(
+  userData: CreateUserInput
+): Promise<ReturnType<Omit<UserDocument, 'password'>>> {
+  const existingUser = await User.findOne({ email: userData.email });
 
-  getById: (userId: ObjectId) => User.findById(userId),
-
-  getByEmail: (email: string) => User.findOne({ email }),
-
-  isExistByEmail: (email: string) => User.exists({ email }),
-
-  updatePasswordByUserId: (
-    userId: ObjectId,
-    password: string,
-    session?: ClientSession
-  ) => {
-    const data = [{ _id: userId }, { password, resetPasswords: [] }]
-
-    let params = null
-
-    if (session) {
-      params = [...data, { session }]
-    } else {
-      params = data
-    }
-
-    return User.updateOne(...params)
-  },
-
-  updateVerificationAndEmailByUserId: (
-    userId: ObjectId,
-    email: string,
-    session?: ClientSession
-  ) => {
-    const data = [{ _id: userId }, { email, verified: true, verifications: [] }]
-
-    let params = null
-
-    if (session) {
-      params = [...data, { session }]
-    } else {
-      params = data
-    }
-
-    return User.updateOne(...params)
-  },
-
-  updateProfileByUserId: (
-    userId: ObjectId,
-    { firstName, lastName }: { firstName: string; lastName: string },
-    session?: ClientSession
-  ) => {
-    const data = [{ _id: userId }, { firstName, lastName }]
-
-    let params = null
-
-    if (session) {
-      params = [...data, { session }]
-    } else {
-      params = data
-    }
-
-    return User.updateOne(...params)
-  },
-
-  updateEmailByUserId: (
-    userId: ObjectId,
-    email: string,
-    session?: ClientSession
-  ) => {
-    const data = [{ _id: userId }, { email, verified: false }]
-
-    let params = null
-
-    if (session) {
-      params = [...data, { session }]
-    } else {
-      params = data
-    }
-
-    return User.updateOne(...params)
-  },
-
-  deleteById: (userId: ObjectId, session?: ClientSession) =>
-    User.deleteOne({ user: userId }, { session }),
-
-  addResetPasswordToUser: async (
-    {
-      userId,
-      resetPasswordId
-    }: {
-      userId: ObjectId
-      resetPasswordId: ObjectId
-    },
-    session?: ClientSession
-  ) => {
-    let options = {}
-
-    if (session) {
-      options = { session }
-    }
-
-    const user = await User.findOne({ _id: userId }, null, options)
-
-    if (user) {
-      if (!user.resetPasswords) {
-        user.resetPasswords = []
-      }
-      user.resetPasswords.push(resetPasswordId)
-      await user.save({ session })
-    }
-  },
-
-  addVerificationToUser: async (
-    {
-      userId,
-      verificationId
-    }: {
-      userId: ObjectId
-      verificationId: ObjectId
-    },
-    session?: ClientSession
-  ) => {
-    let options = {}
-
-    if (session) {
-      options = { session }
-    }
-
-    const user = await User.findOne({ _id: userId }, null, options)
-
-    if (user) {
-      if (!user.verifications) {
-        user.verifications = []
-      }
-      user.verifications.push(verificationId)
-      await user.save({ session })
-    }
+  if (existingUser !== null) {
+    return {
+      success: false,
+      status: 409,
+      message: 'User already exist.',
+      data: null,
+    };
   }
+
+  try {
+    const hashedPassword = await getHashedPassword(userData.password);
+    const newUser = await User.create({
+      ...userData,
+      password: hashedPassword,
+    });
+
+    return {
+      success: true,
+      status: 200,
+      message: 'User created successfully.',
+      data: newUser,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      status: 404,
+      message: error.message,
+      data: error,
+    };
+  }
+}
+
+export async function signInUser(
+  userCredentials: LoginUserInput
+): Promise<ReturnType<LoginUserReturnType>> {
+  const currentUser = await User.findOne({ email: userCredentials.email });
+
+  if (!currentUser) {
+    return {
+      success: false,
+      status: 401,
+      message:
+        'No account is associate with enterd email, Try creating account.',
+      data: null,
+    };
+  }
+
+  const isPasswordValid = await validatePassword(
+    currentUser,
+    userCredentials.password
+  );
+
+  if (!isPasswordValid) {
+    return {
+      success: false,
+      status: 401,
+      message: 'Invalid password, Try again.',
+      data: null,
+    };
+  }
+
+  const token = generateJwtToken(currentUser);
+
+  const user = {
+    userId: currentUser.id,
+    userName: `${currentUser.firstName} ${currentUser.lastName}`,
+    userEmail: currentUser.email,
+    token,
+  };
+
+  return {
+    success: true,
+    status: 200,
+    message: 'Login success.',
+    data: user,
+  };
 }

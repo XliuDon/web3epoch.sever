@@ -1,35 +1,24 @@
-import express, { Express } from 'express'
-import { join } from 'path'
-import 'dotenv/config'
+import express from 'express';
+import dotenv from 'dotenv';
+import routes from './routes';
+import database from './utils/database';
 
-import '@/infrastructure/logger'
-import { mongoose, redis } from '@/dataSources'
-import {
-  corsMiddleware,
-  authMiddleware,
-  notFoundMiddleware
-} from '@/middlewares'
-import { router } from '@/routes'
-import { i18next, i18nextHttpMiddleware } from '@/i18n'
+dotenv.config();
 
-mongoose.run()
-redis.run()
+const app = express();
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  res.header("Content-Type","application/x-www-form-urlencoded")
+  next();
+});
+app.use(express.json());
 
-const app: Express = express()
-
-app.use(
-  join('/', process.env.STORAGE_PATH),
-  express.static(join(__dirname, process.env.STORAGE_PATH))
-)
-
-app.use(
-  express.json({ limit: '10mb' }),
-  express.urlencoded({ limit: '10mb', extended: true }),
-  corsMiddleware,
-  i18nextHttpMiddleware.handle(i18next),
-  authMiddleware,
-  router,
-  notFoundMiddleware
-)
-
-app.listen(process.env.APP_PORT)
+app.listen(process.env.PORT, () => {
+  routes(app);
+  database();
+  console.log(`✅ Server is up and running on port ${process.env.PORT}`);
+});
