@@ -1,8 +1,8 @@
 {
-  "name": "jwt-auth",
+  "name": "web2epoch-server",
   "version": "1.0.0",
   "main": "index.js",
-  "author": "Nipun Ravisara",
+  "author": "Don",
   "license": "MIT",
   "scripts": {
     "start": "node build/index.js",
