@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createCategory, getCategory, editCategory, getCategoryList } from '../services/categoryService';
+import { createCategory, getCategory, editCategory, getCategoryList, deleteCategory } from '../services/categoryService';
 import getUserId from '../utils/userInfo'
 
 export async function createCategoryController(
@@ -55,3 +55,15 @@ export async function getCategoryListController(
   return res.status(response.status).json(response);
 }
 
+export async function deleteCategoryController(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const response = await deleteCategory(req.body, await getUserId(req));
+
+  if (response.success === true) {
+    return res.status(response.status).json(response);
+  }
+
+  return res.status(response.status).json(response);
+}

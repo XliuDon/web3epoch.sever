@@ -5,7 +5,9 @@ import {
   EditInventoryInput,
   GetInventoryInput,
   ImportInventoryListInput,
+  DeleteInventoryInput,
   ReturnType,
+  SearchInventoryInput,
   InventoryListReturnType
 } from 'src/types/inventoryType';
 
@@ -56,7 +58,7 @@ export async function getInventory(
   userId: string,
 ): Promise<ReturnType<InventoryReturnType>> {
 
-  const findinventory = await inventoryModel.findOne({ _id: getInventory.id, userId: userId });
+  const findinventory = await inventoryModel.findOne({ _id: getInventory.id, userId: userId , isDelete:{$ne: true}});
 
   if (!findinventory) {
     return {
@@ -80,7 +82,7 @@ export async function editInventory(
   editinventory: EditInventoryInput,
   userId: string,
 ): Promise<ReturnType<InventoryReturnType>> {
-  const findInventory = await inventoryModel.findOne({ _id: editinventory.id, userId: userId  });
+  const findInventory = await inventoryModel.findOne({ _id: editinventory.id, userId: userId , isDelete:{$ne: true} });
 
   if (!findInventory) {
     return {
@@ -118,7 +120,7 @@ export async function editInventory(
 export async function getInventoryList(
   userId: string,
 ): Promise<ReturnType<InventoryListReturnType>> {
-  const findInventorys = await inventoryModel.find({ userId: userId});
+  const findInventorys = await inventoryModel.find({ userId: userId, isDelete:{$ne: true}});
 
   if (!findInventorys) {
     return {
@@ -139,4 +141,68 @@ export async function getInventoryList(
     message: 'get inventory list success.',
     data: inventoryList,
   };
+}
+
+export async function searchInventoryList(
+  searchData: SearchInventoryInput,
+  userId: string,
+): Promise<ReturnType<InventoryListReturnType>> {
+  const findInventorys = await inventoryModel.find({ userId: userId, productId: searchData.productId, isDelete:{$ne: true}, content: new RegExp('.*' + searchData.keywords + '.*')});
+
+  if (!findInventorys) {
+    return {
+      success: false,
+      status: 401,
+      message:
+        'No inventory find.',
+      data: null,
+    };
+  }
+  const inventoryList: InventoryListReturnType = {
+    inventoryList: findInventorys
+  };
+
+  return {
+    success: true,
+    status: 200,
+    message: 'get inventory list success.',
+    data: inventoryList,
+  };
+}
+
+
+export async function deleteInventory(
+  inventoryData: DeleteInventoryInput,
+  userId: string,
+): Promise<ReturnType<InventoryReturnType>> {
+  const findInventory = await inventoryModel.findOne({ _id: inventoryData.id, userId: userId  });
+
+  if (!findInventory) {
+    return {
+      success: false,
+      status: 401,
+      message:
+        'No inventory find.',
+      data: null,
+    };
+  }
+  try {    
+    findInventory.isDelete = true;
+    findInventory.save();
+
+    return {
+      success: true,
+      status: 200,
+      message: 'Category delete successfully.',
+      data: findInventory,
+    };
+
+  } catch (error: any) {
+    return {
+      success: false,
+      status: 404,
+      message: error.message,
+      data: error,
+    };
+  }
 }

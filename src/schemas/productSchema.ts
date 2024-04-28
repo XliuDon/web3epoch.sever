@@ -12,6 +12,10 @@ export interface GetProductSchema {
   id: string;
 }
 
+export interface DeleteProductSchema {
+  id: string;
+}
+
 export const productSchema: yup.SchemaOf<ProductSchema> = yup.object().shape({
   productName: yup
     .string()
@@ -53,3 +57,9 @@ export const getProductSchema: yup.SchemaOf<GetProductSchema> = yup.object().sha
     .required({ message: 'product id is required.' }),
 });
 
+
+export const deleteProductSchema: yup.SchemaOf<DeleteProductSchema> = yup.object().shape({
+  id: yup
+    .string()
+    .required({ message: 'Product id is required.' }),     
+});

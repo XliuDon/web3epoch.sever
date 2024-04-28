@@ -30,6 +30,10 @@ export interface EditProductInput {
   price: Number;
   description: string;
 }
+//Delete 
+export interface DeleteProductInput {
+  id: string;
+}
 
 export interface ProductReturnType {
   id: string;
@@ -45,6 +49,7 @@ export interface ProductListReturnType {
 
 export interface ProductDocument extends CreateProductInput, Document {
   id: string;
+  isDelete: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

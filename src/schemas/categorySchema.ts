@@ -10,6 +10,10 @@ export interface GetCategorySchema {
   categoryCode: string;
 }
 
+export interface DeleteCategorySchema {
+  categoryCode: string;
+}
+
 const categorySchema: yup.SchemaOf<CategorySchema> = yup.object().shape({
   categoryImgUrl: yup
     .string()
@@ -27,5 +31,12 @@ export const getCategorySchema: yup.SchemaOf<GetCategorySchema> = yup.object().s
     .string()
     .required({ message: 'Category code is required.' }),
 });
+
+export const deleteCategorySchema: yup.SchemaOf<DeleteCategorySchema> = yup.object().shape({
+  categoryCode: yup
+    .string()
+    .required({ message: 'categoryCode is required.' }),     
+});
+
 
 export default categorySchema;

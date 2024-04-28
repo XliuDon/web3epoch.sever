@@ -4,11 +4,12 @@ import {
   EditProductInput,
   GetProductInput,
   CreateProductInput,
+  DeleteProductInput,
   ReturnType,
   ProductListReturnType
 } from 'src/types/productType';
 
-import productModel from '../models/productModel';
+import Product from '../models/productModel';
 
 // Create new cate
 export async function createProduct(
@@ -18,7 +19,7 @@ export async function createProduct(
   
 
   try {   
-    const newProduct = await productModel.create({
+    const newProduct = await Product.create({
       ...productData,
       userId: userId
     });
@@ -44,7 +45,7 @@ export async function getProduct(
   userId: string,
 ): Promise<ReturnType<ProductReturnType>> {
 
-  const findProduct = await productModel.findOne({ _id: getproduct.id, userId: userId });
+  const findProduct = await Product.findOne({ _id: getproduct.id, userId: userId, isDelete:{$ne: true} });
 
   if (!findProduct) {
     return {
@@ -68,7 +69,7 @@ export async function editProduct(
   editProduct: EditProductInput,
   userId: string,
 ): Promise<ReturnType<ProductReturnType>> {
-  const findProduct = await productModel.findOne({ _id: editProduct.id, userId: userId  });
+  const findProduct = await Product.findOne({ _id: editProduct.id, userId: userId, isDelete:{$ne: true}  });
 
   if (!findProduct) {
     return {
@@ -108,7 +109,7 @@ export async function editProduct(
 export async function getProductList(
   userId: string,
 ): Promise<ReturnType<ProductListReturnType>> {
-  const findProducts = await productModel.find({ userId: userId});
+  const findProducts = await Product.find({ userId: userId, isDelete:{$ne: true}});
 
   if (!findProducts) {
     return {
@@ -129,4 +130,42 @@ export async function getProductList(
     message: 'get product list success.',
     data: productList,
   };
+}
+
+
+
+export async function deleteProduct(
+  productData: DeleteProductInput,
+  userId: string,
+): Promise<ReturnType<ProductReturnType>> {
+  const findProduct = await Product.findOne({ _id: productData.id, userId: userId  });
+
+  if (!findProduct) {
+    return {
+      success: false,
+      status: 401,
+      message:
+        'No order find.',
+      data: null,
+    };
+  }
+  try {    
+    findProduct.isDelete = true;
+    findProduct.save();
+
+    return {
+      success: true,
+      status: 200,
+      message: 'Product delete successfully.',
+      data: findProduct,
+    };
+
+  } catch (error: any) {
+    return {
+      success: false,
+      status: 404,
+      message: error.message,
+      data: error,
+    };
+  }
 }

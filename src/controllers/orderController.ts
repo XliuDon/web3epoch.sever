@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { createProduct, getProduct, editProduct, getProductList, deleteProduct } from '../services/productService';
+import { createOrder, getOrder, getOrderList, updatePaidOrder, updateCancelledOrFailedOrder, deleteOrder } from '../services/orderService';
 import getUserId from '../utils/userInfo'
 
-export async function createProductController(
+export async function createOrderController(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const response = await createProduct( req.body, await getUserId(req));
+  const response = await createOrder( req.body, await getUserId(req));
 
   if (response.success === true) {
     return res.status(response.status).json(response);
@@ -15,11 +15,11 @@ export async function createProductController(
   return res.status(response.status).json(response);
 }
 
-export async function editProductController(
+export async function updatePaidController(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const response = await editProduct(req.body, await getUserId(req));
+  const response = await updatePaidOrder(req.body, await getUserId(req));
 
   if (response.success === true) {
     return res.status(response.status).json(response);
@@ -28,11 +28,11 @@ export async function editProductController(
   return res.status(response.status).json(response);
 }
 
-export async function getProductController(
+export async function updateCancelledOrFailedOrderController(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const response = await getProduct(req.body, await getUserId(req));
+  const response = await updateCancelledOrFailedOrder(req.body, await getUserId(req));
 
   if (response.success === true) {
     return res.status(response.status).json(response);
@@ -41,11 +41,11 @@ export async function getProductController(
   return res.status(response.status).json(response);
 }
 
-export async function getProductListController(
+export async function getOrderController(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const response = await getProductList(await getUserId(req));
+  const response = await getOrder(req.body, await getUserId(req));
 
   if (response.success === true) {
     return res.status(response.status).json(response);
@@ -54,11 +54,25 @@ export async function getProductListController(
   return res.status(response.status).json(response);
 }
 
-export async function deleteProductController(
+export async function getOrderListController(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const response = await deleteProduct(req.body, await getUserId(req));
+  const response = await getOrderList(await getUserId(req));
+
+  if (response.success === true) {
+    return res.status(response.status).json(response);
+  }
+
+  return res.status(response.status).json(response);
+}
+
+
+export async function deleteOrderController(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const response = await deleteOrder(req.body, await getUserId(req));
 
   if (response.success === true) {
     return res.status(response.status).json(response);

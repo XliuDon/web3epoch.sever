@@ -21,6 +21,11 @@ export interface GetCategoryInput {
   categoryCode: string;
 }
 
+//Get one category
+export interface DeleteCategoryInput {  
+  categoryCode: string;
+}
+
 //Edit 
 export interface EditCategoryInput {
   categoryImgUrl: string,
@@ -40,6 +45,7 @@ export interface CategoryListReturnType {
 
 export interface CategoryDocument extends CreateCategoryInput, Document {
   id: string;
+  isDelete: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

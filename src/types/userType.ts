@@ -32,6 +32,7 @@ export interface LoginUserReturnType {
 
 export interface UserDocument extends CreateUserInput, Document {
   id: string;
+  isDelete: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

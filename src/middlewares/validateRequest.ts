@@ -1,15 +1,17 @@
 import { NextFunction, Request, Response } from 'express';
 import { SignUpSchema } from 'src/schemas/signUpSchema';
 import { SignInSchema } from 'src/schemas/signInSchema';
-import { CategorySchema, GetCategorySchema } from 'src/schemas/categorySchema';
-import {ProductSchema, GetProductSchema } from 'src/schemas/productSchema';
-import {ImportInventoryListSchema, GetInventorySchema, GetInventoryListSchema, EditInventorySchema, UpdateOrderInventorySchema } from 'src/schemas/inventorySchema';
+import { CategorySchema, GetCategorySchema, DeleteCategorySchema } from 'src/schemas/categorySchema';
+import {ProductSchema, GetProductSchema, DeleteProductSchema } from 'src/schemas/productSchema';
+import {ImportInventoryListSchema, GetInventorySchema, GetInventoryListSchema, EditInventorySchema, UpdateOrderInventorySchema, SearchInventorySchema, DeleteInventorySchema } from 'src/schemas/inventorySchema';
+import {OrderSchema, GetOrderSchema, UpdatePaidOrderSchema, UpdateCancelledOrFailedOrderSchema, DeleteOrderSchema } from 'src/schemas/orderSchema';
 import { SchemaOf } from 'yup';
 
 function validateRequest(schema: SchemaOf<
-  SignInSchema | SignUpSchema | CategorySchema | GetCategorySchema |
-  ProductSchema | GetProductSchema |
-  ImportInventoryListSchema| GetInventorySchema| GetInventoryListSchema| EditInventorySchema| UpdateOrderInventorySchema
+  SignInSchema | SignUpSchema | CategorySchema | GetCategorySchema | DeleteCategorySchema |
+  ProductSchema | GetProductSchema | DeleteProductSchema |
+  ImportInventoryListSchema| GetInventorySchema| GetInventoryListSchema| EditInventorySchema| UpdateOrderInventorySchema | SearchInventorySchema | DeleteInventorySchema |
+  OrderSchema | GetOrderSchema | UpdatePaidOrderSchema | UpdateCancelledOrFailedOrderSchema | DeleteOrderSchema
   >) {
   return async (
     req: Request,

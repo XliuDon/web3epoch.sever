@@ -21,12 +21,23 @@ export interface GetInventoryInput {
   status: number; //0: avaliable, 1: sold, 2: disable
 }
 
+//Search inventories
+export interface SearchInventoryInput {  
+  productId: string; 
+  keywords: string; 
+}
+
 //Edit 
 export interface EditInventoryInput {
   id: string;
   content: string;
   orderNumber: string|undefined;
   status: number;
+}
+
+//Delete 
+export interface DeleteInventoryInput {
+  id: string;
 }
 
 export interface InventoryReturnType {
@@ -49,6 +60,7 @@ export interface InventoryDocument extends Document {
   orderNumber: string|undefined;
   soldAt: Date|undefined;
   status: number;
+  isDelete: boolean;
   createdAt: Date;
   updatedAt: Date;
 }

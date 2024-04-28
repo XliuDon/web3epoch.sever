@@ -8,7 +8,8 @@ const inventorySchema = new Schema(
     status: { type: Number, required: true },
     orderNumber: { type: String },    
     soldAt: { type: Date },        
-    userId: { type: String, required: true}
+    userId: { type: String, required: true},
+    isDelete: { type: Boolean}
   },
   {
     timestamps: true,

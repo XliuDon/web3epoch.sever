@@ -7,7 +7,8 @@ const productSchema = new Schema(
     categoryCode: { type: String, required: true },    
     price: { type: Number, required: true },    
     description: { type: String, required: true },    
-    userId: { type: String, required: true}
+    userId: { type: String, required: true},
+    isDelete: { type: Boolean}
   },
   {
     timestamps: true,

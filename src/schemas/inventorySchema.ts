@@ -30,6 +30,15 @@ export interface UpdateOrderInventorySchema {
   orderNumber: string
 }
 
+export interface SearchInventorySchema {
+  productId: string; 
+  keywords: string,
+}
+
+export interface DeleteInventorySchema {
+  id: string,
+}
+
 export const inventoryListSchema: yup.SchemaOf<ImportInventoryListSchema> = yup.object().shape({
   productId: yup
     .string()
@@ -88,6 +97,22 @@ export const getInventoryListSchema: yup.SchemaOf<GetInventoryListSchema> = yup.
   .string()
   .required({ message: 'product id is required.' }),
 });
+
+export const searchInventorySchema: yup.SchemaOf<SearchInventorySchema> = yup.object().shape({
+  productId: yup
+    .string()
+    .required({ message: 'productId is required.' }),
+  keywords: yup
+  .string()
+  .required({ message: 'keywords is required.' }),
+});
+
+export const deleteInventorySchema: yup.SchemaOf<DeleteInventorySchema> = yup.object().shape({
+  id: yup
+    .string()
+    .required({ message: 'id is required.' }),     
+});
+
 
 
 export default InventorySchema;

@@ -4,6 +4,7 @@ import {
   EditCategoryInput,
   GetCategoryInput,
   CreateCategoryInput,
+  DeleteCategoryInput,
   ReturnType,
   CategoryListReturnType
 } from 'src/types/categoryType';
@@ -55,7 +56,7 @@ export async function getCategory(
   userId: string,
 ): Promise<ReturnType<CategoryReturnType>> {
 
-  const findCate = await CategoryModel.findOne({ categoryCode: getCategory.categoryCode, userId: userId });
+  const findCate = await CategoryModel.findOne({ categoryCode: getCategory.categoryCode, userId: userId, isDelete:{$ne: true} });
 
   if (!findCate) {
     return {
@@ -79,7 +80,7 @@ export async function editCategory(
   editCategory: EditCategoryInput,
   userId: string,
 ): Promise<ReturnType<CategoryReturnType>> {
-  const findCate = await CategoryModel.findOne({ categoryCode: editCategory.categoryCode, userId: userId  });
+  const findCate = await CategoryModel.findOne({ categoryCode: editCategory.categoryCode, userId: userId , isDelete:{$ne: true} });
 
   if (!findCate) {
     return {
@@ -117,7 +118,7 @@ export async function editCategory(
 export async function getCategoryList(
   userId: string,
 ): Promise<ReturnType<CategoryListReturnType>> {
-  const findCates = await CategoryModel.find({ userId: userId});
+  const findCates = await CategoryModel.find({ userId: userId, isDelete:{$ne: true}});
 
   if (!findCates) {
     return {
@@ -138,4 +139,41 @@ export async function getCategoryList(
     message: 'get category list success.',
     data: categoryList,
   };
+}
+
+
+export async function deleteCategory(
+  cateData: DeleteCategoryInput,
+  userId: string,
+): Promise<ReturnType<CategoryReturnType>> {
+  const findCategory = await CategoryModel.findOne({ categoryCode: cateData.categoryCode, userId: userId  });
+
+  if (!findCategory) {
+    return {
+      success: false,
+      status: 401,
+      message:
+        'No category find.',
+      data: null,
+    };
+  }
+  try {    
+    findCategory.isDelete = true;
+    findCategory.save();
+
+    return {
+      success: true,
+      status: 200,
+      message: 'Category delete successfully.',
+      data: findCategory,
+    };
+
+  } catch (error: any) {
+    return {
+      success: false,
+      status: 404,
+      message: error.message,
+      data: error,
+    };
+  }
 }

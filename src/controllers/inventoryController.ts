@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { importInventory, getInventory, editInventory, getInventoryList } from '../services/inventoryService';
+import { importInventory, getInventory, editInventory, getInventoryList, searchInventoryList, deleteInventory } from '../services/inventoryService';
 import getUserId from '../utils/userInfo'
 
 export async function importInventoryController(
@@ -54,3 +54,29 @@ export async function getInventoryListController(
   return res.status(response.status).json(response);
 }
 
+
+export async function searchInventoryListController(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const response = await searchInventoryList(req.body, await getUserId(req));
+
+  if (response.success === true) {
+    return res.status(response.status).json(response);
+  }
+
+  return res.status(response.status).json(response);
+}
+
+export async function deleteInventoryController(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const response = await deleteInventory(req.body, await getUserId(req));
+
+  if (response.success === true) {
+    return res.status(response.status).json(response);
+  }
+
+  return res.status(response.status).json(response);
+}
