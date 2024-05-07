@@ -17,6 +17,7 @@ export interface GetInventorySchema {
 
 export interface GetInventoryListSchema {
   productId: string;
+  status: number | undefined;
 }
 
 export interface EditInventorySchema {
@@ -25,14 +26,20 @@ export interface EditInventorySchema {
   status: number;
 }
 
+export interface DeliveredInventoriesSchema {  
+  productId: string; 
+  orderNumber: string
+}
+
 export interface UpdateOrderInventorySchema {
   id: string | undefined,
   orderNumber: string
 }
 
 export interface SearchInventorySchema {
-  productId: string; 
+  productId: string,
   keywords: string,
+  status: number | undefined
 }
 
 export interface DeleteInventorySchema {
@@ -96,6 +103,8 @@ export const getInventoryListSchema: yup.SchemaOf<GetInventoryListSchema> = yup.
   productId: yup
   .string()
   .required({ message: 'product id is required.' }),
+  status: yup
+  .number()
 });
 
 export const searchInventorySchema: yup.SchemaOf<SearchInventorySchema> = yup.object().shape({
@@ -105,6 +114,8 @@ export const searchInventorySchema: yup.SchemaOf<SearchInventorySchema> = yup.ob
   keywords: yup
   .string()
   .required({ message: 'keywords is required.' }),
+  status: yup
+    .number()
 });
 
 export const deleteInventorySchema: yup.SchemaOf<DeleteInventorySchema> = yup.object().shape({
@@ -113,6 +124,14 @@ export const deleteInventorySchema: yup.SchemaOf<DeleteInventorySchema> = yup.ob
     .required({ message: 'id is required.' }),     
 });
 
+export const deliveredInventoriesSchema: yup.SchemaOf<DeliveredInventoriesSchema> = yup.object().shape({
+  orderNumber: yup
+    .string()
+    .required({ message: 'orderNumber is required.' }),
+    productId: yup
+    .string()
+    .required({ message: 'productId is required.' }),
+});
 
 
 export default InventorySchema;

@@ -11,29 +11,58 @@ import {
   updateOrderItemDeliveryStatus,
   updateOrderItemsDeliveryStatusWithAdmin } from '../services/orderService';
 
+import {InventoryWithProductNameReturnType} from '../types/inventoryType';
+import {OrderDocument} from '../types/orderType';
 import {
     UpdatePaymentInput
   } from '../types/paymentType';
 
 import { getUpdateDeliverInventories } from '../services/inventoryService';
 import { updatePaidPayment } from '../services/paymentService';
-import getUserId from '../utils/userInfo';
-import sendEmail from '../services/emailService';
+import sendEmailWithTemplate from '../utils/emailFormat';
 
-export async function createOrderController(
+export async function updatePaidController(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const response = await createOrder( req.body);
-
+  const response = await updatePaidPayment(req.body);
   if (response.success === true) {
-    return res.status(response.status).json(response);
+    const updateOrder = {
+      orderNumber: req.body.orderNumber,
+      paidTx: req.body.paidTx,
+      customerWallet: req.body.customerWallet,
+    }
+
+    const orderResp = await updatePaidOrder(updateOrder);
+    if (orderResp.success === true) {
+      const deliveryResponse =await getUpdateDeliverInventories(req.body.orderNumber);
+      if(deliveryResponse.success === true){
+          //todo: email inventories to customer
+          const inventoryList = (deliveryResponse.data as Array<InventoryWithProductNameReturnType>);
+          const messageId = await sendEmailWithTemplate((orderResp.data as OrderDocument).email,req.body.orderNumber, inventoryList)
+          const emailSuccess = messageId.length>0;
+          if(emailSuccess){
+            const orderItems = await getOrderItemsWithAdmin(req.body.orderNumber);          
+            await updateOrderItemsDeliveryStatusWithAdmin(orderItems)
+          }
+          
+        return res.status(deliveryResponse.status).json(deliveryResponse); 
+      }else{
+        const updateInput  = {
+          orderNumber: req.body.orderNumber,
+          status: 3
+        }
+        const updateOrderStatus = await updateOrderStatusWithAdmin(updateInput);
+        return res.status(deliveryResponse.status).json(deliveryResponse);
+      }
+    }
+
   }
 
   return res.status(response.status).json(response);
 }
 
-export async function updateOrderPaidAndDeliveryController(
+export async function updateExpiredPaymentController(
   req: Request,
   res: Response
 ): Promise<Response> {
@@ -75,70 +104,4 @@ export async function updateOrderPaidAndDeliveryController(
   }
 
   return res.status(paymentResponse.status).json(paymentResponse);
-}
-
-export async function updateOrderStatusController(
-  req: Request,
-  res: Response
-): Promise<Response> {
-  const response = await updateOrderStatus(req.body, await getUserId(req));
-
-  if (response.success === true) {
-    return res.status(response.status).json(response);
-  }
-
-  return res.status(response.status).json(response);
-}
-
-export async function getOrderController(
-  req: Request,
-  res: Response
-): Promise<Response> {
-  const response = await getOrder(req.body);
-
-  if (response.success === true) {
-    return res.status(response.status).json(response);
-  }
-
-  return res.status(response.status).json(response);
-}
-
-export async function getOrderListController(
-  req: Request,
-  res: Response
-): Promise<Response> {
-  const response = await getOrderList(await getUserId(req));
-
-  if (response.success === true) {
-    return res.status(response.status).json(response);
-  }
-
-  return res.status(response.status).json(response);
-}
-
-
-export async function deleteOrderController(
-  req: Request,
-  res: Response
-): Promise<Response> {
-  const response = await deleteOrder(req.body, await getUserId(req));
-
-  if (response.success === true) {
-    return res.status(response.status).json(response);
-  }
-
-  return res.status(response.status).json(response);
-}
-
-export async function updateOrderItemDeliveryStatusController(
-  req: Request,
-  res: Response
-): Promise<Response> {
-  const response = await updateOrderItemDeliveryStatus(req.body, await getUserId(req));
-
-  if (response.success === true) {
-    return res.status(response.status).json(response);
-  }
-
-  return res.status(response.status).json(response);
 }

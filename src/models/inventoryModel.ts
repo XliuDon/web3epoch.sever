@@ -5,7 +5,7 @@ const inventorySchema = new Schema(
   {    
     productId:  { type: String, required: true },
     content: { type: String, required: true },
-    status: { type: Number, required: true },
+    status: { type: Number, required: true }, //0: avaliable, 1: sold, 2: disable
     orderNumber: { type: String },    
     soldAt: { type: Date },        
     userId: { type: String, required: true},

@@ -34,6 +34,7 @@ export interface EditCategoryInput {
 }
 
 export interface CategoryReturnType {
+  id: string,
   categoryImgUrl: string,
   categoryName: string;
   categoryCode: string;

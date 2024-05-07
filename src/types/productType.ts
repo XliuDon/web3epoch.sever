@@ -41,6 +41,7 @@ export interface ProductReturnType {
   categoryCode: string;
   price: Number;
   description: string;
+  inventoryCount: number;
 }
 
 export interface ProductListReturnType {
@@ -49,6 +50,7 @@ export interface ProductListReturnType {
 
 export interface ProductDocument extends CreateProductInput, Document {
   id: string;
+  userId: string;
   isDelete: boolean;
   createdAt: Date;
   updatedAt: Date;

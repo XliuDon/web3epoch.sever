@@ -10,9 +10,10 @@ app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
     'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
+    'Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Headers, Authorization'
   );
   res.header("Content-Type","application/x-www-form-urlencoded")
+  res.header("Content-Type","multipart/form-data")  
   next();
 });
 app.use(express.json());

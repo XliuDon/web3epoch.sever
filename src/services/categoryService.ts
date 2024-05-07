@@ -118,7 +118,13 @@ export async function editCategory(
 export async function getCategoryList(
   userId: string,
 ): Promise<ReturnType<CategoryListReturnType>> {
-  const findCates = await CategoryModel.find({ userId: userId, isDelete:{$ne: true}});
+  let query = {}
+  if(userId == "0"){
+    query = { isDelete:{$ne: true}}
+  }else{
+    query = { userId: userId, isDelete:{$ne: true}}
+  }
+  const findCates = await CategoryModel.find(query);
 
   if (!findCates) {
     return {

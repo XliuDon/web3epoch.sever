@@ -6,6 +6,7 @@ export interface OrderItemSchema {
 }
 
 export interface OrderSchema {
+  email: string;
   orderItems: Array<OrderItemSchema>;
 }
 
@@ -19,16 +20,24 @@ export interface DeleteOrderSchema {
 
 export interface UpdatePaidOrderSchema {
   orderNumber: string,
-  customerWallet: string,
-  paidTx: string,
+  customerWallet: string | undefined,
+  paidTx: string | undefined,
 }
 
-export interface UpdateCancelledOrFailedOrderSchema {
+export interface UpdateOrderStatusSchema {
   orderNumber: string,
   status: number,
 }
 
+export interface UpdateOrderItemDeliveryStatusSchema {
+  orderItemId: string,
+  status: number,
+}
+
 export const orderSchema: yup.SchemaOf<OrderSchema> = yup.object().shape({
+  email: yup
+    .string()
+    .required({ message: 'Customer email is required.' }),     
   orderItems: yup
     .array()
     .of(
@@ -53,14 +62,12 @@ export const updatePaidOrderSchema: yup.SchemaOf<UpdatePaidOrderSchema> = yup.ob
     .string()
     .required({ message: 'orderNumber is required.' }),  
   customerWallet: yup
-    .string()
-    .required({ message: 'customeWallet is required.' }),     
+    .string(),    
   paidTx: yup
-    .string()
-    .required({ message: 'paidTx is required.' }),     
+    .string(),    
 });
 
-export const updateCancelledOrFailedOrderSchema: yup.SchemaOf<UpdateCancelledOrFailedOrderSchema> = yup.object().shape({
+export const updateOrderStatusSchema: yup.SchemaOf<UpdateOrderStatusSchema> = yup.object().shape({
   orderNumber: yup
     .string()
     .required({ message: 'orderNumber is required.' }),  
@@ -73,4 +80,13 @@ export const deleteOrderSchema: yup.SchemaOf<DeleteOrderSchema> = yup.object().s
   orderNumber: yup
     .string()
     .required({ message: 'orderNumber is required.' }),     
+});
+
+export const updateOrderItemDeliveryStatusSchema: yup.SchemaOf<UpdateOrderItemDeliveryStatusSchema> = yup.object().shape({
+  orderItemId: yup
+    .string()
+    .required({ message: 'orderItemId is required.' }),  
+  status: yup
+    .number()
+    .required({ message: 'status is required.' }),       
 });

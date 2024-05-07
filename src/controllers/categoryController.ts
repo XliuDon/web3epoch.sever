@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { createCategory, getCategory, editCategory, getCategoryList, deleteCategory } from '../services/categoryService';
-import getUserId from '../utils/userInfo'
+import getUserId from '../utils/userInfo';
 
 export async function createCategoryController(
   req: Request,
@@ -66,4 +66,15 @@ export async function deleteCategoryController(
   }
 
   return res.status(response.status).json(response);
+}
+
+export async function uploadCategoryImageController(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const file = req.file
+  console.log('upload file:', file);
+ 
+
+  return res.status(200).json({status:200, data:null});
 }

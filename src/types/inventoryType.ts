@@ -21,10 +21,17 @@ export interface GetInventoryInput {
   status: number; //0: avaliable, 1: sold, 2: disable
 }
 
+//Get one inventory List
+export interface GetInventoryListInput {  
+  productId: string; 
+  status: number; //0: avaliable, 1: sold, 2: disable
+}
+
 //Search inventories
 export interface SearchInventoryInput {  
   productId: string; 
   keywords: string; 
+  status: number | undefined;
 }
 
 //Edit 
@@ -33,6 +40,12 @@ export interface EditInventoryInput {
   content: string;
   orderNumber: string|undefined;
   status: number;
+}
+
+//Deliver products 
+export interface DeliveredInventoriesInput {    
+  productId: string; 
+  orderNumber: string;
 }
 
 //Delete 
@@ -47,6 +60,10 @@ export interface InventoryReturnType {
   orderNumber: string|undefined;
   status: number;
   soldAt: Date|undefined;
+}
+
+export interface InventoryWithProductNameReturnType extends  InventoryReturnType{
+  productName: string | undefined;
 }
 
 export interface InventoryListReturnType {

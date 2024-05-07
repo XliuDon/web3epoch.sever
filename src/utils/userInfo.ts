@@ -10,7 +10,8 @@ async function getUserId(req: Request): Promise<string> {
         const token = req.header('Authorization')?.replace('Bearer ', '');
      
         if (!token) {
-          throw new Error();
+          // throw new Error();
+          return '0';
         }
      
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string);  

@@ -9,6 +9,7 @@ const orderItemSchema = new Schema(
     price: { type: Number, required: true },        
     amount: {type: Number, required: true },
     userId: { type: String, required: true},
+    deliveryStatus: { type: String, required: true, default: 0}, //0: wait for delivery, 1:delivered, 2: error
     isDelete: { type: Boolean}
   },
   {

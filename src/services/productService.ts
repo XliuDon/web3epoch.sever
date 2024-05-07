@@ -10,6 +10,7 @@ import {
 } from 'src/types/productType';
 
 import Product from '../models/productModel';
+import Inventory from '../models/inventoryModel';
 
 // Create new cate
 export async function createProduct(
@@ -47,6 +48,7 @@ export async function getProduct(
 
   const findProduct = await Product.findOne({ _id: getproduct.id, userId: userId, isDelete:{$ne: true} });
 
+  const inventoryCount = await Inventory.countDocuments({productId: getproduct.id,status:0, userId: userId});
   if (!findProduct) {
     return {
       success: false,
@@ -61,7 +63,10 @@ export async function getProduct(
     success: true,
     status: 200,
     message: 'get product success.',
-    data: findProduct,
+    data: {
+      ...findProduct,
+      inventoryCount: inventoryCount
+    }
   };
 }
 
@@ -92,7 +97,10 @@ export async function editProduct(
       success: true,
       status: 200,
       message: 'product update successfully.',
-      data: findProduct,
+      data: {
+        ...findProduct,
+        inventoryCount:0
+      }
     };
 
   } catch (error: any) {
@@ -109,7 +117,14 @@ export async function editProduct(
 export async function getProductList(
   userId: string,
 ): Promise<ReturnType<ProductListReturnType>> {
-  const findProducts = await Product.find({ userId: userId, isDelete:{$ne: true}});
+  let query = {}
+  if(userId == "0"){
+    query = { isDelete:{$ne: true}}
+  }else{
+    query = { userId: userId, isDelete:{$ne: true}}
+  }
+
+  const findProducts = await Product.find(query);
 
   if (!findProducts) {
     return {
@@ -120,8 +135,30 @@ export async function getProductList(
       data: null,
     };
   }
+
+  const productsPromise:Array<ProductReturnType> = await Promise.all(
+    findProducts.map(async(p)=>{
+      let query = {}
+      if(userId == "0"){
+        query = {productId: p.id,status:0}
+      }else{
+        query = {productId: p.id,status:0, userId: userId}
+      }
+
+        const inventoryCount = await Inventory.countDocuments(query);
+        const returnProduct : ProductReturnType ={
+          id: p._id,
+          productName:  p.productName,
+          categoryCode:  p.categoryCode,
+          price:  p.price,
+          description:  p.description,
+          inventoryCount: inventoryCount
+        }
+        return returnProduct
+    })
+  )
   const productList: ProductListReturnType = {
-    productList: findProducts
+    productList: productsPromise
   };
 
   return {
@@ -145,19 +182,19 @@ export async function deleteProduct(
       success: false,
       status: 401,
       message:
-        'No order find.',
+        'No Product find.',
       data: null,
     };
   }
   try {    
     findProduct.isDelete = true;
     findProduct.save();
-
+    
     return {
       success: true,
       status: 200,
       message: 'Product delete successfully.',
-      data: findProduct,
+      data: null
     };
 
   } catch (error: any) {
