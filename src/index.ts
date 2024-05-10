@@ -2,6 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import routes from './routes';
 import database from './utils/database';
+import {subscrible, unsubscrible} from './okx/okxSerivce';
+import {paymentWatcher} from './services/paymentWatchdog';
 
 dotenv.config();
 
@@ -21,5 +23,7 @@ app.use(express.json());
 app.listen(process.env.PORT, () => {
   routes(app);
   database();
+  // subscrible();
+  paymentWatcher()
   console.log(`✅ Server is up and running on port ${process.env.PORT}`);
 });

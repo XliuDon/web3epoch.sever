@@ -20,7 +20,7 @@ export async function createPayment(
     let findPrice = paymentData.priceToPay;
     for(let i=0;i<1000;i++){
 
-      const payment = await Payment.findOne({ price: findPrice, status:0 });  
+      const payment = await Payment.findOne({ priceToPay: findPrice, status:0 });  
       if(!payment){
         break;
       }
@@ -76,13 +76,13 @@ export async function updatePaidPayment(
 ): Promise<ReturnType<PaymentDocument>> {
  
   try {        
-    const payment = await Payment.findOne({ orderNumber: paymentData.orderNumber });
+    const payment = await Payment.findOne({ orderNumber: paymentData.orderNumber, status:0 });
     if(!payment){
       return {
         success: false,
         status: 401,
         message:
-          'No Payment found',
+          'No pending payment found',
         data: null,
       };
     }

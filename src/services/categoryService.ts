@@ -94,6 +94,9 @@ export async function editCategory(
   try {    
     findCate.categoryImgUrl = editCategory.categoryImgUrl;
     findCate.categoryName = editCategory.categoryName;
+    if(editCategory.categoryImgUrl){
+      findCate.categoryImgUrl = editCategory.categoryImgUrl;
+    }
 
     findCate.save();
 

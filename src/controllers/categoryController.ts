@@ -6,7 +6,13 @@ export async function createCategoryController(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const cateData = req.body;
+  const cateDataRaw = JSON.parse(req.body.cate_data);
+  const cateData = {
+    categoryImgUrl: req.file.filename,
+    categoryName: cateDataRaw.categoryName,
+    categoryCode: cateDataRaw.categoryCode,
+  }
+  console.log('cateData',cateData)
   const response = await createCategory(cateData, await getUserId(req));
 
   if (response.success === true) {
@@ -20,7 +26,14 @@ export async function editCategoryController(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const response = await editCategory(req.body, await getUserId(req));
+  const cateDataRaw = JSON.parse(req.body.cate_data);
+  const cateData = {
+    categoryImgUrl: req.file.filename,
+    categoryName: cateDataRaw.categoryName,
+    categoryCode: cateDataRaw.categoryCode,
+  }
+  
+  const response = await editCategory(cateData, await getUserId(req));
 
   if (response.success === true) {
     return res.status(response.status).json(response);

@@ -1,7 +1,11 @@
 import * as yup from 'yup';
 
+export interface CategoryWithImageSchema {
+  cate_data: object;
+}
+
 export interface CategorySchema {
-  categoryImgUrl: string,
+  categoryImgUrl: string|undefined,
   categoryName: string;
   categoryCode: string;
 }
@@ -14,10 +18,16 @@ export interface DeleteCategorySchema {
   categoryCode: string;
 }
 
-const categorySchema: yup.SchemaOf<CategorySchema> = yup.object().shape({
+
+export const categoryWithImageSchema: yup.SchemaOf<CategoryWithImageSchema> = yup.object().shape({
+    cate_data: yup
+    .object()
+    .required({ message: 'Category data is required.' }),
+});
+
+export const categorySchema: yup.SchemaOf<CategorySchema> = yup.object().shape({
   categoryImgUrl: yup
-    .string()
-    .required({ message: 'Image Url is required.' }),
+    .string(),
     categoryName: yup
     .string()
     .required({ message: 'Category name is required.' }),
