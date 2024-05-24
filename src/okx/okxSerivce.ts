@@ -9,31 +9,8 @@ const querystring = require('querystring');
 // const cryptoJS = require('crypto-js'); // Import encryption modules for subsequent encryption calculations
 // const { Web3 } = require('web3'); // Import the Web3 library for interacting with Ethereum
 
-const chainIds = ["1","56","137","79","43114"]
+const chainIds = ["1","56","137","195"]
 const apiBaseUrl = 'https://www.okx.com'; // Define the underlying path of the request
-// const web3RpcUrl = 'https://.....pro'; // The URL for the Ethereum node you want to connect to
-// const privateKey = '0x...xxx'; // Set the private key of your wallet (replace '0x...xxx' with your actual private key). NEVER SHARE THIS WITH ANYONE!
-// const chainId = '1';
-// const fromTokenAddress = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';    // Native token address
-// const toTokenAddress = '0xdac17f958d2ee523a2206206994597c13d831ec7';
-
-// const userWalletAddress = '71A6EC3962EEDB27EA1D392A289713F9'; // User wallet address
-// const secretKey = '71A6EC3962EEDB27EA1D392A289713F9'; // The key obtained from the previous application
-// const apiKey = 'a19c2a7e-ee9a-4186-ae93-2d095441e8b7'; // The api Key obtained from the previous application
-// const passphrase = 'IopJkl$2024'; // The password created when applying for the key
-// const date = new Date(); // Get the current time
-// const timestamp = date.toISOString(); // Convert the current time to the desired format
-// const web3 = new Web3(new Web3.providers.HttpProvider(web3RpcUrl)); //Establishing web3 link
-
-// const headersParams = {
-//     'Content-Type': 'application/json',
-//     'OK-ACCESS-KEY': apiKey,
-//     'OK-ACCESS-SIGN': cryptoJS.enc.Base64.stringify(
-//       cryptoJS.HmacSHA256(timestamp + 'GET' + '/api/v5/dex/aggregator/xxx?xxx=xxx', secretKey)
-//     ),
-//     'OK-ACCESS-TIMESTAMP': timestamp,
-//     'OK-ACCESS-PASSPHRASE': passphrase,
-//   };
   
 const getRequestUrl = (apiBaseUrl:string, api:string, queryParams:any) => {
     if(queryParams==null){
@@ -202,9 +179,9 @@ export async function unsubscrible(){
     
         const result = await sendPostRequest(api,params);
         if(result && result.data.code === 0){
-            console.debug(`subscrible chain success: ${chainId}`);
+            console.debug(`✅subscrible chain success: ${chainId}`);
         }else{
-            console.debug(`subscrible fail: ${chainId}`,result);
+            console.debug(`❌subscrible fail: ${chainId}`,result);
         }
     })
 }

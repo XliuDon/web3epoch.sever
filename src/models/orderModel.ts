@@ -5,7 +5,7 @@ const orderSchema = new Schema(
   {    
     email: { type: String, required: true },
     orderNumber: { type: String, required: true },
-    totalPrice: { type: String, required: true },        
+    totalPrice: { type: Number, required: true },        
     status: { type: Number, required: true }, //0: unpaid, 1:paid, 2: cancelled, 3: paid, but failed update, 4: sent order to customer, 5: expired
     customerWallet:  { type: String},        
     paidTx:  { type: String},        

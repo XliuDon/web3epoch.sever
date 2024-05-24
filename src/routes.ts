@@ -14,6 +14,7 @@ import {importInventoryController, editInventoryController, getInventoryControll
 import {createOrderController, getOrderController, getOrderListController, updateOrderPaidAndDeliveryController, updateOrderStatusController, deleteOrderController, updateOrderItemDeliveryStatusController} from './controllers/orderController';
 import {updateExpiredPaymentController, updatePaidController, callbackPaidController} from './controllers/paymentController';
 import {createSupportController, updateSupportStatusController, getAllSupportsController, getPendingSupportsController} from './controllers/supportController';
+import {getDashboardReportController} from './controllers/reportController';
 
 import {productSchema, editProductSchema, getProductSchema, deleteProductSchema} from './schemas/productSchema';
 import {inventoryListSchema, editInventorySchema, getInventoryListSchema, getInventorySchema,  searchInventorySchema, deleteInventorySchema, deliveredInventoriesSchema } from './schemas/inventorySchema';
@@ -95,6 +96,8 @@ function routes(app: Express): void {
   app.post('/api/supportupdatestatus', [auth, validateRequest(updateSupportStatusSchema)], updateSupportStatusController);
   app.get('/api/supportgetall', [auth], getAllSupportsController);
   app.get('/api/supportgetpending',[auth], getPendingSupportsController);
+
+  app.get('/api/report',[auth], getDashboardReportController);
   
 }
 

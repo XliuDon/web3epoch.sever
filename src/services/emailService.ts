@@ -24,7 +24,7 @@ export default async function sendEmail(toEmail: string,
     console.log('transporter',transporter)
     // send mail with defined transport object
     const info = await transporter.sendMail({
-      from: `"Web3 Epoch" <${process.env.SMTP_USER}>`, // sender address
+      from: `"Hinge Team" <${process.env.SMTP_USER}>`, // sender address
       to: toEmail, // list of receivers
       subject: subject, // Subject line
       text: content, // plain text body
