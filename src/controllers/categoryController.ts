@@ -6,13 +6,18 @@ export async function createCategoryController(
   req: Request,
   res: Response
 ): Promise<Response> {
+  let fileName = '';
+  if (req.file) {
+    fileName = req.file.filename;
+  }
+
   const cateDataRaw = JSON.parse(req.body.cate_data);
   const cateData = {
-    categoryImgUrl: req.file.filename,
+    categoryImgUrl: fileName,
     categoryName: cateDataRaw.categoryName,
     categoryCode: cateDataRaw.categoryCode,
   }
-  console.log('cateData',cateData)
+  // console.log('cateData',cateData)
   const response = await createCategory(cateData, await getUserId(req));
 
   if (response.success === true) {
@@ -26,9 +31,14 @@ export async function editCategoryController(
   req: Request,
   res: Response
 ): Promise<Response> {
+  let fileName = '';
+  if (req.file) {
+    fileName = req.file.filename;
+  }
+
   const cateDataRaw = JSON.parse(req.body.cate_data);
   const cateData = {
-    categoryImgUrl: req.file.filename,
+    categoryImgUrl: fileName,
     categoryName: cateDataRaw.categoryName,
     categoryCode: cateDataRaw.categoryCode,
   }

@@ -33,6 +33,7 @@
     "@types/bcrypt": "^5.0.0",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^4.17.13",
+    "@types/multer": "^1.4.11",
     "axios": "^1.6.8",
     "bcrypt": "^5.0.1",
     "crypto-js": "^4.2.0",
