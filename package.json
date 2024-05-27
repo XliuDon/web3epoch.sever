@@ -5,7 +5,7 @@
   "author": "Don",
   "license": "MIT",
   "scripts": {
-    "start": "node build/index.js",
+    "start": "node build/src/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p .",
     "lint": "eslint .",
