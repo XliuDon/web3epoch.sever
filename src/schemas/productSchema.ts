@@ -5,7 +5,7 @@ export interface ProductSchema {
   productName: string,
   price: number;
   categoryCode: string;
-  description: string;
+  description: string | undefined;
 }
 
 export interface GetProductSchema {
@@ -38,8 +38,7 @@ export const editProductSchema: yup.SchemaOf<ProductSchema> = yup.object().shape
     .string()
     .required({ message: 'Product name is required.' }),
     description: yup
-    .string()
-    .required({ message: 'product description is required.' }),
+    .string(),
     categoryCode: yup
     .string()
     .required({ message: 'Categrory code is required.' }),
