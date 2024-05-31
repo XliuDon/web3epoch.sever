@@ -3,6 +3,7 @@ import signInController from './controllers/signInController';
 import signUpController from './controllers/signUpController';
 import validateRequest from './middlewares/validateRequest';
 import {auth} from './middlewares/auth';
+import authValidateWebhook from './middlewares/validateWebhook';
 import signInSchema from './schemas/signInSchema';
 import signUpSchema from './schemas/signUpSchema';
 import categorySchema from './schemas/categorySchema';
@@ -90,7 +91,7 @@ function routes(app: Express): void {
 
   app.post('/api/paymentpaid', [validateRequest(updatePaymentSchema)], updatePaidController);
   app.post('/api/paymentexpired', [auth, validateRequest(paymentExpiredSchema)], updateExpiredPaymentController);
-  app.post('/api/paymenthook',callbackPaidController);
+  app.post('/api/paymenthook',[authValidateWebhook()], callbackPaidController);
 
   app.post('/api/supportcreate', [validateRequest(supportSchema)], createSupportController);
   app.post('/api/supportupdatestatus', [auth, validateRequest(updateSupportStatusSchema)], updateSupportStatusController);

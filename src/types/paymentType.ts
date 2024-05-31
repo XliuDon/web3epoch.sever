@@ -47,6 +47,25 @@ export interface GetPaymentInputByPriceInput {
 // }
 
 
+// Request Okx transactin history
+export interface GetTransactionsInput {  
+  walletId: string;
+  chainIds: Array<string>;
+  limit: string;
+  startDate: string;
+  endDate: string;
+}
+
+// Okx transaction history
+export interface OkxTransactions {  
+  chainId: string;
+  txHash: string;
+  fromAddr: string;
+  toAddr: string;
+  txTime: string;
+  coinAmount: string;
+  coinSymbol: string;
+}
 
 export interface PaymentDocument extends CreatePaymentInput, UpdatePaymentInput, Document {
   id: string;

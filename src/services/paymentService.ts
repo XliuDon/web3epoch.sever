@@ -148,3 +148,19 @@ export async function updateExpiredPayment(
     };
   }
 }
+
+export async function getPendingPaymentByPrice(price: number) :
+  Promise<PaymentDocument | null> 
+{ 
+    try {        
+      const payment = await Payment.findOne({ priceToPay: price, status:0 });  
+      if(!payment){
+        return null;
+      }
+    
+      return payment;
+  
+    } catch (error: any) {
+      return null;
+    }
+}  

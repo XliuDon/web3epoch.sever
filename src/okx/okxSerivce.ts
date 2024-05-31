@@ -4,16 +4,54 @@ import axios from "axios";
 // import CryptoJS from '@types/crypto-js';
 import HmacSHA256  from 'crypto-js/hmac-sha256';
 import Base64 from 'crypto-js/enc-base64';
+import {OkxTransactions} from '../types/paymentType';
+
 const querystring = require('querystring');
 
 // const cryptoJS = require('crypto-js'); // Import encryption modules for subsequent encryption calculations
 // const { Web3 } = require('web3'); // Import the Web3 library for interacting with Ethereum
+interface TransactionsRequest {  
+  walletId: string;
+  chainIds: Array<string>;
+  lastRowId: string;
+  limit: string;
+  startDate: string;
+  endDate: string;
+}
+
+export const chains = [  
+  {
+      chainId:'195',
+      coinSymbol:'USDT',
+      wallet:'TPoWhurgMhi9eUFiaNsNiQ8WcERtjACRg5',
+  },
+  {
+      chainId:'56',
+      coinSymbol:'BUSD',
+      wallet:'0xd697a17b2772dbd3ce06edd6c6213b0c5772401f',
+  },
+  {
+      chainId:'1',
+      coinSymbol:'USDT',
+      wallet:'0xd697a17b2772dbd3ce06edd6c6213b0c5772401f',
+  },
+  {
+      chainId:'137',
+      coinSymbol:'USDC',
+      wallet:'0xd697a17b2772dbd3ce06edd6c6213b0c5772401f',
+  },
+  // {
+  //     chainId:'SOL',
+  //     chainName:'USDC',
+  //     wallet:'8Hxvx87m1JometVdRqABWyCPta51zB5f9M85R7XAV6SP',
+  // },
+]
 
 const chainIds = ["1","56","137","195"]
 const apiBaseUrl = 'https://www.okx.com'; // Define the underlying path of the request
   
 const getRequestUrl = (apiBaseUrl:string, api:string, queryParams:any) => {
-    if(queryParams==null){
+    if(queryParams===null){
         return apiBaseUrl + api;
     }
     return apiBaseUrl + api + '?' + new URLSearchParams(queryParams).toString();
@@ -22,10 +60,10 @@ const getRequestUrl = (apiBaseUrl:string, api:string, queryParams:any) => {
 
 // 定义 API 凭证和项目 ID
 const api_config = {
-    api_key: 'a19c2a7e-ee9a-4186-ae93-2d095441e8b7',
-    secret_key: '71A6EC3962EEDB27EA1D392A289713F9',
+    api_key: '98e3f2f2-f3e5-4dca-b4e2-0d052b4e41e0',
+    secret_key: '18A04E1F7ACB744EF122F9A63A9D0B2E',
     passphrase: 'IopJkl$2024',
-    project: 'c48624bb5ec4f1f41b241a39e21937c3' // 此处仅适用于 WaaS APIs
+    project: '239a874c51087c5fa4d36680121743e6' // 此处仅适用于 WaaS APIs
   };
   
   function preHash(timestamp:string, method:string, request_path:string, params:any) {
@@ -104,17 +142,10 @@ const api_config = {
       'Content-Type': 'application/json' // POST 请求需要加上这个头部
     };
   
-    const options = {
-      hostname: 'www.okx.com',
-      path: request_path,
-      method: 'POST',
-      headers: headers
-    };
-  
     try{        
         const response =await axios.post(getRequestUrl(apiBaseUrl,request_path,null),
             {
-                ...params
+              ...params
             },
             { 
                 headers: headers
@@ -129,40 +160,38 @@ const api_config = {
   
   }
   
-//   // GET 请求示例
-//   const getRequestPath = '/api/v5/dex/aggregator/quote';
-//   const getParams = {
-//     'chainId': 42161,
-//     'amount': 1000000000000,
-//     'toTokenAddress': '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
-//     'fromTokenAddress': '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'
-//   };
-//   sendGetRequest(getRequestPath, getParams);
+async function checkscrible(params: any):Promise<boolean>{
+
+  const api = '/api/v5/waas/check-subscribe';   
   
-//   // POST 请求示例
-//   const postRequestPath = '/api/v5/mktplace/nft/ordinals/listings';
-//   const postParams = {
-//     slug: 'sats'
-//   };
-//   sendPostRequest(postRequestPath, postParams);
+  const result = await sendPostRequest(api,params);
+  console.log('check subscrible', result?.data)
+  if(result && result.data.code === 0 &&(result.data.data[0]===true)){
+      return true;
+  }
+  return false;
+}
 
 export async function subscrible(){
 
     chainIds.map(async(chainId)=>{
         const params = {
-            callbackUrl:"https://www.web3epoch.com/api/paymenthook",
+            callbackUrl:"https://webhook.site/efdf3955-20de-49aa-ac9c-97b9b5002319",//"https://web3epoch.xyz/api/paymenthook",
             type:"TRANSACTION",
             chainId:chainId
           };
     
-        const api = '/api/v5/waas/subscribe';   
+        if(!await checkscrible(params)){
+          const api = '/api/v5/waas/subscribe';   
     
-        const result = await sendPostRequest(api,params);
-        if(result && (result.data.code === 0||result.status===200)){
-            console.debug(`✅ subscrible chain success: ${chainId}`);
-        }else{
-            console.debug(`❌subscrible fail: ${chainId}`);
-        }
+          const result = await sendPostRequest(api,params);
+          console.log('subscrible result', result?.data)
+          if(result && (result.data.code === 0)){
+              console.debug(`✅ subscrible chain success: ${chainId}`);
+          }else{
+              console.debug(`❌subscrible fail: ${chainId}`);
+          }
+        }       
     })
 }
 
@@ -170,7 +199,7 @@ export async function unsubscrible(){
 
     chainIds.map(async(chainId)=>{
         const params = {
-            callbackUrl:"https://www.web3epoch.com/api/paymenthook",
+            callbackUrl:"https://www.web3epoch.xyz/api/paymenthook",
             type:"TRANSACTION",
             chainId:chainId
           };
@@ -184,4 +213,79 @@ export async function unsubscrible(){
             console.debug(`❌subscrible fail: ${chainId}`,result);
         }
     })
+}
+
+export async function getTransations(startDate: Date, endDate: Date): Promise<Array<OkxTransactions> | null>{
+
+  const transactions :Array<OkxTransactions> = [];
+  await Promise.all(chains.map(async(chainId)=>{
+      const payload: TransactionsRequest = {  
+        walletId: chainId.wallet,
+        chainIds: [chainId.chainId],
+        lastRowId:"",
+        limit: "20",
+        startDate: dateInYyyyMmDdHhMmSs(startDate),
+        endDate: dateInYyyyMmDdHhMmSs(endDate)
+      }
+      
+      const api = '/api/v5/waas/transaction/get-transactions';   
+  
+      const result = await sendPostRequest(api, payload);
+      if(result && result.data.code === 0){
+          // console.debug(`✅subscrible chain success: ${chainId}`);
+            result.data.map((pay:any)=>{
+              try{
+              if(pay.txType === "1"){
+                if(pay.assetSummary.coinSymbol === chainId.coinSymbol){
+                  transactions.push( {
+                      chainId: pay.chainId,
+                      txHash: pay.txHash,
+                      fromAddr: pay.fromAddr,
+                      toAddr: pay.toAddr,
+                      txTime: pay.txTime,
+                      coinAmount: pay.coinAmount,
+                      coinSymbol: pay.coinSymbol,
+                    }
+                  )
+                }
+              }
+            }catch(error: any){
+             console.log(error.message); 
+            }
+          })
+      }
+  })
+  )
+
+  return transactions;
+}
+
+function padTwoDigits(num: number) {
+  return num.toString().padStart(2, "0");
+}
+
+function dateInYyyyMmDdHhMmSs(date: Date, dateDiveder: string = "-") {
+  // :::: Exmple Usage ::::
+  // The function takes a Date object as a parameter and formats the date as YYYY-MM-DD hh:mm:ss.
+  // 👇️ 2023-04-11 16:21:23 (yyyy-mm-dd hh:mm:ss)
+  //console.log(dateInYyyyMmDdHhMmSs(new Date()));
+
+  //  👇️️ 2025-05-04 05:24:07 (yyyy-mm-dd hh:mm:ss)
+  // console.log(dateInYyyyMmDdHhMmSs(new Date('May 04, 2025 05:24:07')));
+  // Date divider
+  // 👇️ 01/04/2023 10:20:07 (MM/DD/YYYY hh:mm:ss)
+  // console.log(dateInYyyyMmDdHhMmSs(new Date(), "/"));
+  return (
+    [
+      date.getFullYear(),
+      padTwoDigits(date.getMonth() + 1),
+      padTwoDigits(date.getDate()),
+    ].join(dateDiveder) +
+    " " +
+    [
+      padTwoDigits(date.getHours()),
+      padTwoDigits(date.getMinutes()),
+      padTwoDigits(date.getSeconds()),
+    ].join(":")
+  );
 }

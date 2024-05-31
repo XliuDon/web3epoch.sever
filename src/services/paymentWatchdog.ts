@@ -1,7 +1,9 @@
 import {getPendingPayments, updateExpiredPayment} from './paymentService';
 import Order from '../models/orderModel';
+import { getTransations } from 'src/okx/okxSerivce';
 
 import {
+    OkxTransactions,
     PaymentDocument
   } from 'src/types/paymentType';
 
@@ -21,6 +23,26 @@ export async function paymentWatcher(){
                     }
                 }                
             })
+        }        
+    }catch(error:any){
+        console.log(error.message)
+    }
+
+    setTimeout(async function () {
+        await paymentWatcher();
+      }, 1000 * 10);
+}
+
+
+export async function onChainPaymentWatcher(){
+    try{
+        const pendingPayments = await getPendingPayments();
+        if(pendingPayments){
+            // if(pendingPayments.data && pendingPayments.data?.length >0){
+            //     start
+            //     await getTransations()
+            // }
+            
         }        
     }catch(error:any){
         console.log(error.message)

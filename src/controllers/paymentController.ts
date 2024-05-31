@@ -17,9 +17,10 @@ import {
     ReturnType,
     UpdatePaymentInput
   } from '../types/paymentType';
+import { TransfersType } from 'src/types/solanaWebhookType';
 
 import { getUpdateDeliverInventories } from '../services/inventoryService';
-import { updatePaidPayment } from '../services/paymentService';
+import { updatePaidPayment, getPendingPaymentByPrice } from '../services/paymentService';
 import sendEmailWithTemplate from '../utils/emailFormat';
 
 export async function callbackPaidController(
@@ -44,52 +45,33 @@ export async function updatePaidController(
   }else{
     return res.status(301).json("Recieved payment and failed to deliver the products, it may already delivered");  
   }
-  // const response = await updatePaidPayment(req.body);
-  // if (response.success === true) {
-  //   const updateOrder = {
-  //     orderNumber: req.body.orderNumber,
-  //     paidTx: req.body.paidTx,
-  //     customerWallet: req.body.customerWallet,
-  //   }
-
-  //   const orderResp = await updatePaidOrder(updateOrder);
-  //   if (orderResp.success === true) {
-  //     const deliveryResponse =await getUpdateDeliverInventories(req.body.orderNumber);
-  //     if(deliveryResponse.success === true){
-  //         //todo: email inventories to customer
-  //         const inventoryList = (deliveryResponse.data as Array<InventoryWithProductNameReturnType>);
-  //         const messageId = await sendEmailWithTemplate((orderResp.data as OrderDocument).email,req.body.orderNumber, inventoryList)
-  //         const emailSuccess = messageId.length>0;
-  //         if(emailSuccess){
-  //           const orderItems = await getOrderItemsWithAdmin(req.body.orderNumber);          
-  //           await updateOrderItemsDeliveryStatusWithAdmin(orderItems)
-  //         }
-          
-  //       return res.status(deliveryResponse.status).json(deliveryResponse); 
-  //     }else{
-  //       const updateInput  = {
-  //         orderNumber: req.body.orderNumber,
-  //         status: 3
-  //       }
-  //       const updateOrderStatus = await updateOrderStatusWithAdmin(updateInput);
-  //       return res.status(deliveryResponse.status).json(deliveryResponse);
-  //     }
-  //   }
-
-  // }
-
-  // return res.status(response.status).json(response);
 }
 
 async function updatePayment( req: Request):Promise<boolean>{
 
+  console.log('okx payment callback:',req.body)
+
+  const transfer = req.body as TransfersType;
+
+  if(transfer === null){
+    return false;
+  }
+  
+  let paidPrice = transfer.nativeTransfers[0].amount / 1_000_000_000;
+  
+  const payment = await getPendingPaymentByPrice(paidPrice)
+  
+  if(payment === null){
+    return false;
+  }
+
   const payData = {
-    orderNumber: "string",
-    pricePaid: 0,
-    chainId: "string",
-    tokenTick: "string",
-    customerWallet: "string",
-    paidTx: "string",
+    orderNumber: payment.orderNumber,
+    pricePaid: paidPrice,
+    chainId:  'SOL', //req.body.data[0].chainId,
+    tokenTick: 'USDC',//req.body.data[0].assetSummary.coinSymbol,
+    customerWallet: transfer.nativeTransfers[0].fromUserAccount,
+    paidTx: transfer.signature,
   };
 
   const response = await updatePaidPayment(payData);
