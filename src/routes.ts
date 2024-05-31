@@ -56,7 +56,7 @@ function routes(app: Express): void {
     res.status(200).send('Hello from server...')
   );
 
-  app.post('/api/signup', validateRequest(signUpSchema), signUpController);
+  app.post('/api/signup', [auth, validateRequest(signUpSchema)], signUpController);
   app.post('/api/signin', validateRequest(signInSchema), signInController);
 
   app.post('/api/categorycreate', [auth, upload.single('file')], createCategoryController);
