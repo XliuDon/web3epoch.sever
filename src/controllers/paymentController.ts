@@ -57,7 +57,7 @@ async function updatePayment( req: Request):Promise<boolean>{
     return false;
   }
   
-  let paidPrice = transfer.nativeTransfers[0].amount / 1_000_000_000;
+  let paidPrice = transfer.tokenTransfers[0].tokenAmount;
   
   const payment = await getPendingPaymentByPrice(paidPrice)
   
@@ -70,7 +70,7 @@ async function updatePayment( req: Request):Promise<boolean>{
     pricePaid: paidPrice,
     chainId:  'SOL', //req.body.data[0].chainId,
     tokenTick: 'USDC',//req.body.data[0].assetSummary.coinSymbol,
-    customerWallet: transfer.nativeTransfers[0].fromUserAccount,
+    customerWallet: transfer.tokenTransfers[0].fromUserAccount,
     paidTx: transfer.signature,
   };
 

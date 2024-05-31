@@ -1,11 +1,12 @@
 
 export interface RawType {  
-  amount:number ;
+  tokenAmount:number ;
   fromUserAccount: string;
   toUserAccount: string;
+  mint: string;
 }
 
 export interface TransfersType {
-  nativeTransfers: Array<RawType>,
+  tokenTransfers: Array<RawType>,
   signature: string
 }

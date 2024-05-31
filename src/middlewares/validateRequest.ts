@@ -22,7 +22,7 @@ function validateRequest(schema: SchemaOf<
     res: Response,
     next: NextFunction
   ): Promise<Response | void> => {
-    try {
+    try {      
       const validatedReqBody = await schema.validate(req.body);
       req.body = validatedReqBody;
       next();

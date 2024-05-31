@@ -10,10 +10,14 @@ function authValidateWebhook() {
     try {
       const token = req.header('authorization')?.replace('Bearer ', '');
       if (!token || token !== process.env.WEBHOOK_AUTH) {
-        throw new Error();
+        throw new Error('authorization fail');
       } 
       
-      const validateBody = transfersSchema.validate(req.body);
+      const validateBody = await transfersSchema.validate(req.body[0]);
+      
+      if(!validateBody.tokenTransfers || validateBody.tokenTransfers[0].mint !== 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'){
+          throw new Error('pay wrong token!')
+      }
       req.body = validateBody;
 
       next();
